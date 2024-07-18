@@ -9,9 +9,15 @@
 		<div th:if="${session.userId != null}" class="write-box border rounded m-3">
 			<textarea id="writeTextArea" placeholder="내용을 입력해주세요" class="w-100 border-0"></textarea>
 			
-			<div class="d-flex justify-content-between">
+			<div class="d-flex justify-content-between align-items-center">
 				<div class="file-upload d-flex">
-					<img width="35" src="https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-image-512.png">
+					<!-- file 태그를 숨겨두고 이미지를 클릭하면 파일을 클릭한 것과 같은 효과를 준다 -->
+					<input type="file" id="file" accept=".jpg, .png, .gif" class="d-none">
+					
+					<!-- 이미지에 마우스 올리면 마우스 커서가 link로 변경 -->
+					<a href="#" id="fileUploadBtn"><img width="35" src="https://cdn4.iconfinder.com/data/icons/ionicons/512/icon-image-512.png"></a>
+					
+					<div id="fileName" class="ml-2"></div>
 				</div>
 				<button id="writeBtn" class="btn btn-info">게시</button>
 			</div>
@@ -79,6 +85,108 @@
 
 <th:block layout:fragment="script">
     <script>
+		$(document).ready(function() {
+			// 이미지 a 태그 클릭 => 숨겨져 있는 id="file" 태그 동작시킴
+			$("#fileUploadBtn").on('click', function(e) {
+				e.preventDefault(); // event off 올라가는거 방지
+				// alert("이미지 올리기");
+				$("#file").click(); // input type="file" 클릭 하는 코드
+			});
+			
+			// 파일이 선택될 떄, 1.유효성 체크  2. 파일명 노출
+			$("#file").on('change', function(e) {
+				// 취소를 누를때 처리
+				// 파일이 비워지므로 .name에서 에러 발생
+				let file = e.target.files[0];
+				if (file == null) {
+					$("#file").val("");
+					$("#fileName").text("");
+					return;
+				}
+				
+				// alert("이미지 선택");
+				let fileName = e.target.files[0].name;
+				console.log(fileName); // more-icon.png
+				
+				// 확장자 validation
+				let ext = fileName.split(".").pop().toLowerCase();
+				console.log(ext); // png
+				
+				if (ext != "gif" && ext != "png" && ext != "jpg") {
+					alert("이미지 파일만 업로드 할수 있습니다. (.gif, .png, .jpg)");
+					$("#file").val(""); // 파일 태그에 올라온 파일 제거 (보이지 않지만 꼭 처리!!!!)
+					$("#fileName").text(""); // 사용자한테 보이는 이름 제거
+					return;
+				}
+				
+				// 2. 파일명 노출
+				$("#fileName").text(fileName);
+			});
+			
+			$("#writeBtn").on('click', function() {
+				// alert("개시");
+				let content = $("#writeTextArea").val();
+				//console.log(content);
+				let fileName = $("#file").val();
+				//console.log(fileName);
+				
+				if (!content) {
+					alert("내용을 입력하세요.");
+					return;
+				}
+				
+				if (!fileName) {
+					alert("이미지를 추가해주세요.");
+					return;
+				}
+				
+				// 파일명이 비워져 있지 않으면 => 확장자 체크
+				if (fileName) {
+					let ext = fileName.split(".").pop().toLowerCase();
+					//console.log(ext);
+					
+					if($.inArray(ext, ["jpg", "gif", "png"]) == -1) {
+						alert("이미지 파일만 업로드 할수있습니다. (.jpg, .gif, .png)");
+						$("#file").val(""); // 파일 초기화
+						return;
+					}
+				}
 
+				// form태그를 js에서 만든다.
+				// 이미지 업로드 시 반드시 필요
+				
+				let formData = new FormData();
+				formData.append("content", content); // key 는 name 과 같고 리퀘스트 파라미터명
+				formData.append("file", $("#file")[0].files[0]);
+				
+				// AJAX
+				$.ajax({
+					//request
+					type:"POST"
+					, url:"/post/create"
+					, data:formData
+					, enctype:"multipart/form-data" // 파일 업로드 필수 설정
+					, processData:false // 파일 업로드 필수 설정
+					, contentType:false // 파일 업로드 필수 설정
+					
+					//respond
+					, success:function(data) {
+						if (data.code == 200) {
+							alert("글이 게시되었습니다.");
+							// 글목록 새로고침
+							location.href = "/timeline/timeline-view"
+						} else if (data.code == 403)  { // 비로그인시
+							location.href = "/user/sign-in-view";
+						} else {
+							alert(data.error_message);
+						}
+					}
+					
+					, error:function(e) {
+						alert("글을 게시하는데 실패했습니다.");
+					}
+				});
+			});
+		});
     </script>
 </th:block>
