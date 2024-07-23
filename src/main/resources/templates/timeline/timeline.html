@@ -45,8 +45,10 @@
 				
 				<!-- 좋아요 -->
 				<div class="card-like m-3">
-					<img src="/img/heart-icon.png" width="18" height="18" alt="empty heart">
-					<span th:text="|좋아요 13개|"></span>
+					<a href="#" class="likeBtn" th:data-post-id="${card.post.id}" th:data-user-id="${session.userId}">
+					<img th:if="${card.filledLike == false}" src="/img/heart-icon.png" width="18" height="18" alt="empty heart">
+					<img th:unless="${card.filledLike == false}" src="/img/heart-icon (1).png" width="18" height="18" alt="empty heart"></a>
+					<span th:text="${card.likeCount}"></span>
 				</div>
 				
 				<!-- 글 -->
@@ -238,6 +240,61 @@
 					}
 				});
 				
+			});
+			// 댓글 삭제 버튼
+			$(".comment-del-btn").on('click', function(e) {
+				e.preventDefault();
+				let commentId = $(this).data("comment-id");
+				// alert(commentId);
+				
+				$.ajax({
+					type:"POST"
+					, url:"/comment/delete"
+					, data:{"commentId":commentId}
+				
+					, success:function(data) {
+						if(data.code == 200) {
+							location.reload(true);
+						} else if (data.code == 403) {
+							alert(data.error_message);
+							location.href = "/user/sign-in-view";
+						} else {
+							alert(data.error_message);
+						}	
+					}
+					
+					, error:function(e) {
+						alert("댓글 삭제 실패.");
+					}
+				});
+			});
+			
+			$(".likeBtn").on('click', function(e) {
+				e.preventDefault();
+				let postId = $(this).data("postId");
+				// alert(postId);
+				let userId = $(this).data("userId");
+				// alert(userId);
+				
+				$.ajax({
+					url:"/like/" + postId
+					, data:{"postId":postId, "userId":userId}
+					
+					, success:function(data) {
+						if(data.code == 200) {
+							location.reload(true);
+						} else if (data.code == 403) {
+							alert(data.error_message);
+							location.href = "/user/sign-in-view";
+						} else {
+							alert(data.error_message);
+						}
+					}
+					
+					, error:function(e) {
+						alert("좋아요에 실패했습니다.")
+					}
+				});
 			});
 		});
     </script>

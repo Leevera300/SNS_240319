@@ -58,7 +58,7 @@ public class CommentRestController {
 		 }
 				
 		// DB delete
-		commentBO.deleteCommentById("commentId");
+		commentBO.deleteCommentById(commentId);
 		
 		// 응답값
 		result.put("code", 200);

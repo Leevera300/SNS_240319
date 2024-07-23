@@ -54,9 +54,12 @@
 			// 중복확인
 			$("#loginIdCheckBtn").on('click', function() {
 				// 리셋
-				$("#idCheck").addClass("d-none");
-				$("#idCheckDuplicated").addClass("d-none");
-				$("#idCheckOk").addClass("d-none");
+				$("#loginId").on('change', function() {
+					$("#idCheck").addClass("d-none");
+					$("#idCheckDuplicated").addClass("d-none");
+					$("#idCheckOk").addClass("d-none");
+					
+				});
 				// alert("중복확인");
 				
 				let loginId = $("#loginId").val().trim();
