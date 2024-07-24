@@ -31,9 +31,9 @@ public class TimelineBO {
 	@Autowired
 	private LikeBO likeBO;
 
-	// input: X
+	// input: int userId
 	// output: List<CardView>
-	public List<CardView> generateCardViewList(Integer userId) {
+	public List<CardView> generateCardViewList(Integer userId) {  // 비로그인도 차임라인은 보여지므로 null 가능
 		List<CardView> cardViewList = new ArrayList<>();
 		
 		// 글목록을 가져온다 List<PostEntity>
@@ -61,7 +61,7 @@ public class TimelineBO {
 			
 			// 좋아요를 누른지 여부
 			//private boolean filledLike;
-			boolean filledLike = likeBO.getLikeByPostIdUserId(post.getId(), userId);
+			boolean filledLike = likeBO.filledLikeByPostIdUserId(post.getId(), userId);
 			card.setFilledLike(filledLike);
 			
 			// 넣기

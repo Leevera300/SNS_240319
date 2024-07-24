@@ -34,7 +34,7 @@
 					
 					<!-- 더보기 ...(로그인 된 사람과 글쓴이 정보 일치할 때 보이게) -->
 					<a th:if="${card.post.userId == session.userId}" href="#" class="more-btn">
-						<img src="/img/more-icon.png" width="30">
+						<img class="moreBtn" src="/img/more-icon.png" width="30" th:data-post-id="${card.post.id}">
 					</a>
 				</div>
 				
@@ -273,12 +273,9 @@
 				e.preventDefault();
 				let postId = $(this).data("postId");
 				// alert(postId);
-				let userId = $(this).data("userId");
-				// alert(userId);
 				
 				$.ajax({
 					url:"/like/" + postId
-					, data:{"postId":postId, "userId":userId}
 					
 					, success:function(data) {
 						if(data.code == 200) {

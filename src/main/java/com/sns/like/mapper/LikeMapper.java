@@ -7,21 +7,16 @@ import org.apache.ibatis.annotations.Param;
 @Mapper
 public interface LikeMapper {
 
-	public int selectLikeCountByPostIdUserId(
+	// 카운트 쿠리를 한로 합친다.
+	public int selectLikeCountByPostIdOrUserId(
 			@Param("postId") int postId, 
-			@Param("userId") int userId);
-	
+			@Param("userId") Integer userId);
+
 	public void addLike(
 			@Param("postId") int postId, 
 			@Param("userId") int userId);
 	
 	public void deleteLike(
-			@Param("postId") int postId, 
-			@Param("userId") int userId);
-	
-	public int selectLikeCountByPostId(int postId);
-	
-	public boolean selectLikeByPostIdUserId(
 			@Param("postId") int postId, 
 			@Param("userId") int userId);
 }
