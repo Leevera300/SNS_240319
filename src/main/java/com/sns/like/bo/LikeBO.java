@@ -40,4 +40,10 @@ public class LikeBO {
 		// 로그인이면 1. 행이있으면(1) true	2. 없으면(0) false
 		return likeMapper.selectLikeCountByPostIdOrUserId(postId, userId) == 1 ? true : false;  
 	}
+	
+	//input: postId
+	// output: X
+	public void deleteLikeByPostId(int postId) {
+		likeMapper.deleteLikeByPostId(postId);
+	}
 }
